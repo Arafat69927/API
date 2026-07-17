@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 
 @api_view(['GET','POST'])
 def student_view(req):
-    if req.method == 'GET':
+    if req.method =='GET':
         student_data = studentModel.objects.all()
         serializer_data = studentSerializer(student_data, many=True)
         return Response({
@@ -32,6 +32,49 @@ def student_view(req):
         })
 
 
+ # ----------------------------->  Student / Single Get<---------------------------------
+@api_view(['GET','PUT','DELETE'])
+def student_details(req, id):
+    try:
+        student_data = studentModel.objects.get(id = id)
+    except:
+        return Response({
+            "success" : False,
+            "message" : "Data Not Found !"
+        },status = status.HTTP_404_NOT_FOUND)
+    
+    if req.method == 'GET':
+        serializers_data = studentSerializer(student_data)
+        return Response({
+            "success":True,
+            "message": "SUCCESSFULLY GET DATA",
+            "data": serializers_data.data
+        })
+    
+
+    elif req.method == 'PUT':
+        serializers_data = studentSerializer(student_data, data = req.data)
+        if serializers_data.is_valid():
+            serializers_data.save()
+            return Response({
+                "success":True,
+                "message":"Successfully Update data",
+                "data":serializers_data.data
+            })
+        else:
+            return Response({
+            "success":False,
+            "message":serializers_data.errors, 
+        }, status = status.HTTP_204_NO_CONTENT)
+
+
+
+    elif req.method == 'DELETE':
+        student_data.delete()
+        return Response({
+            "success":True,
+            "message":"Delete Successfully !!!",
+        })
 
 #  subject
 
@@ -62,7 +105,8 @@ def subject_view(req):
 
 
 
-   # ----------------------------->certain get<---------------------------------
+# ----------------------------->  Subject / Single Get<---------------------------------
+
 @api_view(['GET','PUT','DELETE'])
 def subject_detail(req, id):
 
@@ -72,20 +116,18 @@ def subject_detail(req, id):
         
         return Response({
             "success":False,
-            "message":"Data No found !",     
+            "message": "Data No found !",     
         },status= status.HTTP_404_NOT_FOUND)
-
 
     if req.method == 'GET':
         serializers_Data = subjectSerializer(subject_data)
         return Response({
             "success":True,
-            "message":"Successfully Get update",
+            "message": "Successfully Get update",
             "data":serializers_Data.data
         })
-    
 
-    # ----------------------------->delete<---------------------------------
+# ----------------------------->Delete<---------------------------------
 
     elif req.method == 'DELETE':
         subject_data.delete()
